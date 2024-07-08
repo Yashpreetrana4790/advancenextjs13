@@ -7,23 +7,23 @@ import { SignedIn } from "@clerk/nextjs";
 import { formatAndDivideNumber, getTimestamp } from "@/lib/utils";
 import EditDeleteAction from "../shared/EditDeleteAction";
 interface QuestionProps {
-  clerkId?: string
   _id: string;
+  title: string;
   tags: {
     _id: string;
     name: string;
   }[];
-  title: string;
   author: {
-    _id: number;
-    clerkId: string;
+    _id: string;
     name: string;
     picture: string;
+    clerkId: string;
   };
   upvotes: string[];
   views: number;
   answers: Array<object>;
   createdAt: Date;
+  clerkId?: string | null;
 }
 
 const QuestionCard = ({

@@ -6,7 +6,7 @@ import NoResult from './NoResult'
 
 interface Props extends SearchParamsProps {
   userId: string
-  clerkId: string | null
+  clerkId?: string | null;
 }
 
 const QuestionTab = async ({ userId, clerkId }: Props) => {
@@ -21,9 +21,9 @@ const QuestionTab = async ({ userId, clerkId }: Props) => {
             <QuestionCard
               key={question._id}
               _id={question._id}
-              tags={question.tags}
               clerkId={clerkId}
               title={question.title}
+              tags={question.tags}
               author={question.author}
               upvotes={question.upvotes}
               views={question.views}
