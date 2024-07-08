@@ -2,7 +2,6 @@ import { getAllUserQuestions } from '@/lib/actions/question.action'
 import React from 'react'
 import QuestionCard from '../cards/QuestionCard'
 import { SearchParamsProps } from '@/types'
-import { Button } from '../ui/button'
 import NoResult from './NoResult'
 
 interface Props extends SearchParamsProps {
@@ -10,7 +9,7 @@ interface Props extends SearchParamsProps {
   clerkId: string | null
 }
 
-const QuestionTab = async ({ userId, clerkId }: any) => {
+const QuestionTab = async ({ userId, clerkId }: Props) => {
   const userQuestions = await getAllUserQuestions({ userId, page: 1 })
   return (
     <>

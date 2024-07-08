@@ -13,13 +13,13 @@ export async function viewQuestion(params: ViewQuestionParams) {
     const { questionId, userId } = params
 
     if (userId) {
-      const exsisting_Interaction = await Interaction.findOne({
+      const exsistingInteraction = await Interaction.findOne({
         user: userId,
         action: "view",
         question: questionId
       })
 
-      if (exsisting_Interaction) {
+      if (exsistingInteraction) {
         return console.log("User has already viewed this question")
       }
       else {
