@@ -6,12 +6,16 @@ import Tag from "@/database/tag.model";
 import { connectToDatabase } from "../mongoose";
 import {
   CreateQuestionParams,
+  DeleteQuestionParams,
   GetQuestionByIdParams,
   GetQuestionsParams,
+  GetUserStatsParams,
   QuestionVoteParams,
 } from "./shared.types";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
+import Answer from "@/database/answer.model";
+import Interaction from "@/database/Interaction.model";
 
 export async function getQuestions(params: GetQuestionsParams) {
   try {
@@ -30,7 +34,7 @@ export async function getQuestions(params: GetQuestionsParams) {
     return { questions };
   } catch (error) {
     console.log(error);
-    throw error;    
+    throw error;
   }
 }
 export async function createQuestion(params: CreateQuestionParams) {
@@ -40,7 +44,7 @@ export async function createQuestion(params: CreateQuestionParams) {
     const question = await Question.create({
       title,
       content,
-      author, 
+      author,
     });
 
     const tagDocuments = [];
@@ -48,14 +52,15 @@ export async function createQuestion(params: CreateQuestionParams) {
     for (const tag of tags) {
       const existingTag = await Tag.findOneAndUpdate(
         { name: { $regex: new RegExp(`^${tag}$`, "i") } },
-        { $setOnInsert: { name: tag }, $push: { question: question._id } },
-        { upsert: true, new: true }
+        { $setOnInsert: { name: tag }, $push: { questions: question._id } },
+        { upsert: true, new: true },
       );
+
       tagDocuments.push(existingTag._id);
     }
 
 
-    
+
     await Question.findByIdAndUpdate(question._id, {
       $push: { tags: { $each: tagDocuments } },
     })
@@ -66,7 +71,7 @@ export async function createQuestion(params: CreateQuestionParams) {
 
 export async function getQuestionById(params: GetQuestionByIdParams) {
   try {
-    connectToDatabase();  
+    connectToDatabase();
 
     const { questionId } = params;
 
@@ -98,7 +103,7 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
       updatequery = {
         $pull: { downvotes: userId },
         $push: { upvotes: userId }
-      } 
+      }
     } else {
       updatequery = { $addToSet: { upvotes: userId } }
     }
@@ -155,5 +160,42 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
 }
 
 
+export async function getAllUserQuestions(params: GetUserStatsParams) {
+  try {
+    connectToDatabase();
+
+    const { userId, pageSize = 10, page = 1 } = params;
 
 
+    const total = await Question.countDocuments({ author: userId });
+    const questions = await Question.find({ author: userId })
+      .sort({ createdAt: -1 })
+      .populate({ path: "tags", model: Tag, select: "_id name" })
+      .populate({
+        path: "author",
+        model: User,
+        select: "_id clerkId name picture",
+      });
+    return { questions, total };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+
+
+export async function deleteQuestion(params: DeleteQuestionParams) {
+  try {
+    connectToDatabase();
+    const { questionId, path } = params;
+    await Question.deleteOne({ _id: questionId });
+    await Answer.deleteMany({ question: questionId });
+    await Interaction.deleteMany({ question: questionId });
+    await Tag.updateMany({ questions: questionId }, { $pull: { questions: questionId } });
+    revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}

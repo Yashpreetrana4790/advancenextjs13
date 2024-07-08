@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface Props {
   filters: {
@@ -32,11 +33,13 @@ const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
           </div>
         </SelectTrigger>
 
-        <SelectContent>
+        <SelectContent className="dark:bg-black bg-white" >
           <SelectGroup>
             {filters.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
-                {item.name}
+              <SelectItem key={item.value} value={item.value}  >
+                <span className={cn("dark:text-white , dark:bg-black")}>
+                  {item.name}
+                </span>
               </SelectItem>
             ))}
           </SelectGroup>

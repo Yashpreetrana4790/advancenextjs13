@@ -38,7 +38,7 @@ const Theme = () => {
             />
           )}
         </MenubarTrigger>
-        <MenubarContent className="absolute right-[-3rem] mt-3 min-w-[120px] rounded border py-2 dark:border-dark-400 dark:bg-dark-300">
+        <MenubarContent className="absolute right-[-3rem] mt-3 min-w-[120px] rounded border py-2 dark:border-dark-400 dark:bg-dark-300 bg-white">
           {themes.map((item) => (
             <MenubarItem
               key={item.value}
@@ -61,11 +61,10 @@ const Theme = () => {
                 className={`${mode === item.value && "active-theme"}`}
               />
               <p
-                className={`body-semibold text-light-500 ${
-                  mode === item.value
+                className={`body-semibold text-light-500 ${mode === item.value
                     ? "text-primary-500"
                     : "text-dark100_light900"
-                }`}
+                  }`}
               >
                 {item.label}
               </p>
