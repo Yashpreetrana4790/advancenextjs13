@@ -16,6 +16,7 @@ interface QuestionProps {
   title: string;
   author: {
     _id: number;
+    clerkId: string;
     name: string;
     picture: string;
   };
@@ -37,7 +38,7 @@ const QuestionCard = ({
   createdAt,
 }: QuestionProps) => {
 
-  const showActionButtons = clerkId && clerkId === author.clerkId;
+  const showActionButtons = clerkId && clerkId === author?.clerkId;
 
   return (
     <div className="card-wrapper rounded-[10px] p-9 sm:px-11">
@@ -50,12 +51,12 @@ const QuestionCard = ({
             {title}
           </h3>
         </Link>
- 
+
 
         <SignedIn>
-         {showActionButtons && (
+          {showActionButtons && (
             <EditDeleteAction type='Question' itemId={JSON.stringify(_id)} />
-          )} 
+          )}
         </SignedIn>
       </div>
 
