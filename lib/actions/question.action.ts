@@ -164,7 +164,7 @@ export async function getAllUserQuestions(params: GetUserStatsParams) {
   try {
     connectToDatabase();
 
-    const { userId, pageSize = 10, page = 1 } = params;
+    const { userId } = params;
 
 
     const total = await Question.countDocuments({ author: userId });

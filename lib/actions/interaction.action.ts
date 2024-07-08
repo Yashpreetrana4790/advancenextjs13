@@ -1,6 +1,5 @@
 "use server"
 
-import User from "@/database/user.model";
 import { connectToDatabase } from "../mongoose";
 import { ViewQuestionParams } from "./shared.types";
 import Interaction from "@/database/Interaction.model";
@@ -24,7 +23,7 @@ export async function viewQuestion(params: ViewQuestionParams) {
         return console.log("User has already viewed this question")
       }
       else {
- await Interaction.create({ user: userId, action: "view", question: questionId })
+        await Interaction.create({ user: userId, action: "view", question: questionId })
       }
 
     }

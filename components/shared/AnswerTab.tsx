@@ -3,12 +3,12 @@ import React from 'react'
 import AnswerCard from '../cards/AnswerCard'
 
 const AnswerTab = async ({ userId, clerkId }: any) => {
-  const user_answers = await getAllUserAnswers({ userId, page: 1 })
+  const userAnswers = await getAllUserAnswers({ userId, page: 1 })
 
   return (
     <div className="grid grid-cols-1 gap-5">
 
-      {user_answers?.answers?.map((answer) => (
+      {userAnswers?.answers?.map((answer) => (
         <AnswerCard
           key={answer._id}
           clerkId={clerkId}

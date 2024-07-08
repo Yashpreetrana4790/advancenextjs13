@@ -11,14 +11,14 @@ interface Props extends SearchParamsProps {
 }
 
 const QuestionTab = async ({ userId, clerkId }: any) => {
-  const user_questions = await getAllUserQuestions({ userId, page: 1 })
+  const userQuestions = await getAllUserQuestions({ userId, page: 1 })
   return (
     <>
-      {user_questions?.questions ? (
+      {userQuestions?.questions ? (
 
         <div className="grid grid-cols-1 gap-5">
 
-          {user_questions.questions.map((question) => (
+          {userQuestions.questions.map((question) => (
             <QuestionCard
               key={question._id}
               _id={question._id}

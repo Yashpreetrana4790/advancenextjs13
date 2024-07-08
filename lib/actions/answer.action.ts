@@ -6,8 +6,6 @@ import { AnswerVoteParams, CreateAnswerParams, DeleteAnswerParams, GetAnswersPar
 import Question from "@/database/question.model";
 import { revalidatePath } from "next/cache";
 import User from "@/database/user.model";
-import Tag from "@/database/tag.model";
-import path from "path";
 import Interaction from "@/database/Interaction.model";
 
 export async function createAnswer(params: CreateAnswerParams) {

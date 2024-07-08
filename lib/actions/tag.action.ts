@@ -5,7 +5,6 @@ import { connectToDatabase } from "../mongoose";
 import { GetAllTagsParams, GetQuestionsByTagIdParams, GetTopInteractedTagsParams } from "./shared.types";
 import Tag, { ITag } from "@/database/tag.model";
 import Question from "@/database/question.model";
-import { query } from "express";
 import { FilterQuery } from "mongoose";
 
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
