@@ -10,7 +10,7 @@ interface Props {
   type: string;
   itemId: string;
 }
-const EditDeleteAction = ({ type, itemId }: any) => {
+const EditDeleteAction = ({ type, itemId }: Props) => {
 
   const pathname = usePathname()
 
