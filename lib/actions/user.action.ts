@@ -35,15 +35,14 @@ export async function getUserById(params: any) {
 export async function createUser(userData: CreateUserParams) {
   try {
     connectToDatabase();
-
     const newUser = await User.create(userData);
-
     return newUser;
   } catch (error) {
     console.log(error);
     throw error;
   }
 }
+
 
 export async function updateUser(params: UpdateUserParams) {
   try {
@@ -192,8 +191,8 @@ export async function getUserInfo(params: GetUserByIdParams) {
     return {
       user,
       totalquestions,
-      totalanswers      
-      
+      totalanswers
+
     }
   }
   catch (error) {
