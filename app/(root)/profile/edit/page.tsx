@@ -1,5 +1,5 @@
 import React from 'react'
-import { SignedIn, auth } from '@clerk/nextjs'
+import {  auth } from '@clerk/nextjs'
 import { getUserById } from '@/lib/actions/user.action';
 import Profile from '@/components/forms/Profile';
 

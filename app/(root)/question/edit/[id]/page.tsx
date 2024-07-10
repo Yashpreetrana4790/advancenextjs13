@@ -1,5 +1,4 @@
 import Question from '@/components/forms/Question'
-import React, { useEffect } from 'react'
 import { auth } from '@clerk/nextjs'
 import { redirect } from "next/navigation";
 import { getUserById } from '@/lib/actions/user.action';
