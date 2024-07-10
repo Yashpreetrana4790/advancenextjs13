@@ -26,10 +26,12 @@ const AllAnswers = async ({ questionId, totalAnswers, page, userId, filter }: Pr
     <>
 
       <div className="mt-11">
-        <div className='flex items-center justify-between'>
+        <div className='flex items-center justify-between mb-2'>
           <h3 className='primary-text-gradient'>{totalAnswers} Answers</h3>
+          <div className='space-y-2'>
 
-          <Filter filters={AnswerFilters} />
+            <Filter filters={AnswerFilters} />
+          </div>
         </div>
         <div>
           {result?.answers?.map((answer) => (
@@ -42,15 +44,18 @@ const AllAnswers = async ({ questionId, totalAnswers, page, userId, filter }: Pr
                     height={18}
                     alt="profile"
                     className="rounded-full object-cover max-sm:mt-0.5"
-                  />s
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <p className="body-semibold text-dark300_light700">
+                  />
+                  <div className="flex flex-col sm:flex-row sm:items-center space-x-2">
+                    <p className="body-semibold text-dark300_light700 capitalize">
                       {answer?.author?.name}
                     </p>
 
-                    <p className="small-regular text-light400_light500 ml-0.5 mt-0.5 line-clamp-1">
+                    <p className="small-regular text-light400_light500 ml-0.5  line-clamp-1 mr-1">
                       answered
+                    </p>
+                    <p className='small-regular text-light400_light500'>
                       {getTimestamp(answer.createdAt)}
+
                     </p>
                   </div>
                 </Link>

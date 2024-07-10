@@ -22,7 +22,7 @@ const UserCard = ({ user }: Props) => {
         <Image
           width={100}
           height={100}
-          src={user.picture}
+          src={user?.picture}
           alt=""
           className="rounded-full"
         />
@@ -31,7 +31,7 @@ const UserCard = ({ user }: Props) => {
             {user.name}
           </h3>
           <p className="body-regular text-dark500_light500 mt-2 ">
-            @{user.username}
+            @{user?.username}
           </p>
         </div>
       </article>

@@ -30,7 +30,7 @@ export default async function Home() {
           placeholder="Search for questions"
           otherClasses="flex-1"
         />
-
+ 
         <Filter
           filters={HomePageFilters}
           otherClasses="min-h-[56px] sm:min-w-[170px]"

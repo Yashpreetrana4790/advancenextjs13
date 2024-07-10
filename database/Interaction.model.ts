@@ -1,4 +1,3 @@
-import { create } from "domain";
 import { Schema, models, model, Document } from "mongoose";
 
 export interface IInteraction extends Document {
