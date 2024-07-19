@@ -47,13 +47,13 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
     const { tagId, page = 1, pageSize = 10, searchQuery } = params;
     const skipAmount = (page - 1) * pageSize;
 
-    const tagFilter: FilterQuery<ITag> = { _id: tagId};
+    const tagFilter: FilterQuery<ITag> = { _id: tagId };
 
     const tag = await Tag.findOne(tagFilter).populate({
       path: 'questions',
       model: Question,
       match: searchQuery
-        ? { title: { $regex: searchQuery, $options: 'i' }}
+        ? { title: { $regex: searchQuery, $options: 'i' } }
         : {},
       options: {
         sort: { createdAt: -1 },
@@ -62,22 +62,45 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
       },
       populate: [
         { path: 'tags', model: Tag, select: "_id name" },
-        { path: 'author', model: User, select: '_id clerkId name picture'}
+        { path: 'author', model: User, select: '_id clerkId name picture' }
       ]
     })
 
-    if(!tag) {
+    if (!tag) {
       throw new Error('Tag not found');
     }
 
     const isNext = tag.questions.length > pageSize;
-    
+
     const questions = tag.questions;
 
     return { tagTitle: tag.name, questions, isNext };
 
   } catch (error) {
     console.log(error);
+    throw error;
+  }
+}
+
+
+
+
+export async function getPopularTags() {
+  try {
+    const Populartags = await Tag.aggregate([
+      {
+        $project: {
+          name: 1,
+          questionCount: { $size: '$questions' }
+        }
+      },
+      { $sort: { questionCount: -1 } },
+      { $limit: 5 }
+    ]);
+
+    return Populartags;
+  } catch (error) {
+    console.error('Error fetching tags:', error);
     throw error;
   }
 }
