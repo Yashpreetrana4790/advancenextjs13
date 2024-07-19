@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import { Interface } from "readline";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -52,3 +53,16 @@ export const formatAndDivideNumber = (num: number): string => {
     return num?.toString();
   }
 };
+
+interface UrlQueryParams {
+  params: string;
+  key: string;
+  value: string | null
+}
+
+export const formUrlQuery = ({ params, key, value }: UrlQueryParams) => {
+
+const currentroute = params ? `${params}&${key}=${value}` : `?${key}=${value}`
+
+qs.stringify(currentroute)
+}
