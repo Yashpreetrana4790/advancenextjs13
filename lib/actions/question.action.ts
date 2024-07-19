@@ -205,7 +205,7 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
 export async function EditQuestion(params: EditQuestionParams) {
   try {
     connectToDatabase();
-    const { questionId, title, content,  path } = params
+    const { questionId, title, content, path } = params
     const question = await Question.findByIdAndUpdate(questionId).populate({ path: "tags", model: Tag, select: "_id name" })
     if (!question) {
       throw new Error("Question not found")
@@ -216,11 +216,29 @@ export async function EditQuestion(params: EditQuestionParams) {
     await question.save()
     revalidatePath(path)
 
- 
+
 
 
   } catch (error) {
     console.log(error);
     throw error;
+  }
+}
+
+
+export async function getHotQuestions() {
+
+  try {
+    connectToDatabase();
+ 
+    const hotquestions = await Question.find()
+      .sort({ upvotes: -1 , views :-1 })
+      .limit(5)
+   
+
+    return hotquestions
+
+  } catch (error) {
+    
   }
 }

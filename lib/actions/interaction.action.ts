@@ -9,9 +9,7 @@ import Interaction from "@/database/Interaction.model";
 export async function viewQuestion(params: ViewQuestionParams) {
   try {
     connectToDatabase()
-
     const { questionId, userId } = params
-
     if (userId) {
       const exsistingInteraction = await Interaction.findOne({
         user: userId,
@@ -25,9 +23,7 @@ export async function viewQuestion(params: ViewQuestionParams) {
       else {
         await Interaction.create({ user: userId, action: "view", question: questionId })
       }
-
     }
-
   } catch (error) {
     console.log(error);
     throw error
