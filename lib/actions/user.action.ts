@@ -2,7 +2,7 @@
 
 import User from "@/database/user.model";
 import { connectToDatabase } from "../mongoose";
-import { FilterQuery } from "mongoose";
+import { FilterQuery, SortOrder } from "mongoose";
 import {
   CreateUserParams,
   DeleteUserParams,
@@ -88,10 +88,39 @@ export async function deleteUser(params: DeleteUserParams) {
   }
 }
 export async function getAllUsers(params: GetAllUsersParams) {
+
+
+  const { searchQuery, filter } = params;
+  const query: FilterQuery<typeof User> = {}
+
+  if (searchQuery) {
+    query.$or = [
+      { username: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+      { email: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+      { name: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+    ]
+  }
+
+  let sort: { [key: string]: SortOrder } = {};
+
+  if (filter) {
+    switch (filter) {
+
+      case "new_users":
+        sort = { joinedAt: -1 }; // Assuming `joinedAt` is a timestamp field
+        break;
+      case "old_users":
+        sort = { joinedAt: 1 }; // Assuming `joinedAt` is a timestamp field
+        break;
+    }
+  }
+
+  console.log(sort, "sorted bro")
   try {
     connectToDatabase();
 
-    const users = await User.find({}).sort({ createdAt: -1 });
+    const users = await User.find(query).sort(sort);
+    console.log("userchanging ", users)
     return { users };
   } catch (error) {
     console.log(error);

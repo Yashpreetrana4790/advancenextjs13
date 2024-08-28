@@ -6,6 +6,7 @@ import { GetAllTagsParams, GetQuestionsByTagIdParams, GetTopInteractedTagsParams
 import Tag, { ITag } from "@/database/tag.model";
 import Question from "@/database/question.model";
 import { FilterQuery } from "mongoose";
+import queryString from "query-string";
 
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   try {
@@ -28,10 +29,20 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
 }
 
 export async function getAllTags(params: GetAllTagsParams) {
+
+  const { searchQuery } = params;
+  const query: FilterQuery<ITag> = {}
+
+  if (searchQuery) {
+    query.$or = [
+      { name: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+      { description: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+    ]
+  }
   try {
     connectToDatabase();
 
-    const tags = await Tag.find({});
+    const tags = await Tag.find(query);
     return { tags };
   } catch (error) {
     console.log(error);

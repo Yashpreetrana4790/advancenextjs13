@@ -1,5 +1,5 @@
 "use server";
-
+import { SortOrder } from "mongoose";
 import Question from "@/database/question.model";
 import Tag from "@/database/tag.model";
 
@@ -17,11 +17,44 @@ import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
 import Answer from "@/database/answer.model";
 import Interaction from "@/database/Interaction.model";
+import { FilterQuery } from "mongoose";
 
 export async function getQuestions(params: GetQuestionsParams) {
+
+  const { searchQuery, filter } = params;
+  const query: FilterQuery<typeof Question> = {}
+
+  if (searchQuery) {
+    query.$or = [
+      { title: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+      { content: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+    ]
+  }
+
+  let sort: { [key: string]: SortOrder } = {};
+
+  if (filter) {
+    switch (filter) {
+
+      case "newest":
+        sort = { createdAt: -1 }; // Assuming `createdAt` is a timestamp field
+        break;
+      case "frequent":
+        sort = { views: -1 }; // Assuming you have a `views` field
+        break;
+      case "unanswered":
+        query.answers = { $size: 0 };// Assuming you have an `answers` field
+        sort = { createdAt: -1 };
+
+      default:
+        sort = {}; // No specific sorting
+        break;
+    }
+  }
+
   try {
     connectToDatabase();
-    const questions = await Question.find({})
+    const questions = await Question.find(query)
       .populate({
         path: "tags",
         model: Tag,
@@ -30,7 +63,7 @@ export async function getQuestions(params: GetQuestionsParams) {
         path: "author",
         model: User,
       })
-      .sort({ createdAt: -1 });
+      .sort(sort);
 
     return { questions };
   } catch (error) {
@@ -217,8 +250,6 @@ export async function EditQuestion(params: EditQuestionParams) {
     revalidatePath(path)
 
 
-
-
   } catch (error) {
     console.log(error);
     throw error;
@@ -230,15 +261,15 @@ export async function getHotQuestions() {
 
   try {
     connectToDatabase();
- 
+
     const hotquestions = await Question.find()
-      .sort({ upvotes: -1 , views :-1 })
+      .sort({ upvotes: -1, views: -1 })
       .limit(5)
-   
+
 
     return hotquestions
 
   } catch (error) {
-    
+
   }
 }

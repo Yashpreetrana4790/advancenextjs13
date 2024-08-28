@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { Interface } from "readline";
 import { twMerge } from "tailwind-merge";
+import qs from "query-string";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -60,9 +61,45 @@ interface UrlQueryParams {
   value: string | null
 }
 
+interface RemoveUrlQueryParams {
+  params: string;
+  KeysToRemove: string[]
+}
+
+
 export const formUrlQuery = ({ params, key, value }: UrlQueryParams) => {
 
-const currentroute = params ? `${params}&${key}=${value}` : `?${key}=${value}`
+  const currentUrl = qs.parse(params);
+  console.log(currentUrl, "qs parsing");
+  currentUrl[key] = value;
+  return qs.stringifyUrl({
+    url: window.location.pathname,
+    query: currentUrl,
+  },
+    { skipNull: true });
+}
 
-qs.stringify(currentroute)
+// export const HomeFilterchange = ({ params, key, value }: UrlQueryParams) => {
+
+//   const currentUrl = qs.parse(params);
+//   console.log(currentUrl, "qs parsing");
+//   currentUrl[key] = value;
+//   return qs.stringifyUrl({
+//     url: window.location.pathname,
+//     query: currentUrl,
+//   },
+//     { skipNull: true });
+// }
+
+export const removeKeysFromQuery = ({ params, KeysToRemove }: RemoveUrlQueryParams) => {
+  const currentUrl = qs.parse(params);
+  for (const key of KeysToRemove) {
+    delete currentUrl[key];
+  }
+
+  return qs.stringifyUrl({
+    url: window.location.pathname,
+    query: currentUrl,
+  },
+    { skipNull: true });
 }
