@@ -26,7 +26,6 @@ const LocalSearchbar = ({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
-
   const [search, setSearch] = React.useState(query || "");
 
 
