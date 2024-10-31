@@ -1,7 +1,8 @@
 "use server";
-
+import { SortOrder, FilterQuery } from "mongoose";
 import Question from "@/database/question.model";
 import Tag from "@/database/tag.model";
+
 
 import { connectToDatabase } from "../mongoose";
 import {
@@ -19,9 +20,50 @@ import Answer from "@/database/answer.model";
 import Interaction from "@/database/Interaction.model";
 
 export async function getQuestions(params: GetQuestionsParams) {
+
+  const { searchQuery, filter, page = 1, pageSize = 10 } = params;
+
+
+
+  const skipamount = (page - 1) * pageSize
+
+
+  const query: FilterQuery<typeof Question> = {}
+
+
+
+  if (searchQuery) {
+    query.$or = [
+      { title: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+      { content: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+    ]
+  }
+
+  let sort: { [key: string]: SortOrder } = {};
+
+  if (filter) {
+    switch (filter) {
+
+      case "newest":
+        sort = { createdAt: -1 }; // Assuming `createdAt` is a timestamp field
+        break;
+      case "frequent":
+        sort = { views: -1 }; // Assuming you have a `views` field
+        break;
+      case "unanswered":
+        query.answers = { $size: 0 };// Assuming you have an `answers` field
+        sort = { createdAt: -1 };
+        break;
+      default:
+        sort = {}; // No specific sorting
+        break;
+    }
+
+  }
+
   try {
     connectToDatabase();
-    const questions = await Question.find({})
+    const questions = await Question.find(query)
       .populate({
         path: "tags",
         model: Tag,
@@ -30,11 +72,16 @@ export async function getQuestions(params: GetQuestionsParams) {
         path: "author",
         model: User,
       })
-      .sort({ createdAt: -1 });
+      .skip(skipamount)
+      .limit(pageSize)
+      .sort(sort);
 
-    return { questions };
+    const totalquestions = await Question.countDocuments(query);
+    const isNext = totalquestions > skipamount + questions.length
+
+    return { questions, isNext };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -86,7 +133,7 @@ export async function getQuestionById(params: GetQuestionByIdParams) {
 
     return question;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -120,7 +167,7 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
     revalidatePath(path)
     // increment author reputation by +10 for upvoting the question
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -153,9 +200,13 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
     }
 
     revalidatePath(path)
+
+
     // increment author reputation by +10 for upvoting the question
+
+
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -165,21 +216,27 @@ export async function getAllUserQuestions(params: GetUserStatsParams) {
   try {
     connectToDatabase();
 
-    const { userId } = params;
+    const { userId, pageSize = 10, page = 1 } = params;
+
+    const skipAmount = (page - 1) * pageSize;
 
 
     const total = await Question.countDocuments({ author: userId });
     const questions = await Question.find({ author: userId })
       .sort({ createdAt: -1 })
+      .skip(skipAmount)
+      .limit(pageSize + 1)
       .populate({ path: "tags", model: Tag, select: "_id name" })
       .populate({
         path: "author",
         model: User,
         select: "_id clerkId name picture",
       });
-    return { questions, total };
+
+    const isNext = total > skipAmount + questions.length
+    return { questions, total, isNext };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -196,7 +253,7 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
     await Tag.updateMany({ questions: questionId }, { $pull: { questions: questionId } });
     revalidatePath(path);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -217,10 +274,8 @@ export async function EditQuestion(params: EditQuestionParams) {
     revalidatePath(path)
 
 
-
-
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -230,15 +285,16 @@ export async function getHotQuestions() {
 
   try {
     connectToDatabase();
- 
+
     const hotquestions = await Question.find()
-      .sort({ upvotes: -1 , views :-1 })
+      .sort({ upvotes: -1, views: -1 })
       .limit(5)
-   
+
 
     return hotquestions
 
   } catch (error) {
-    
+    console.error(error);
+    throw error;
   }
 }

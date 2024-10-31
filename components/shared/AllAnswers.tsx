@@ -14,11 +14,14 @@ interface Props {
   userId: string;
   totalAnswers: number;
   page?: number;
-  filter?: number;
+  filter?: string;
+  searchParams?: any
 }
-const AllAnswers = async ({ questionId, totalAnswers, page, userId, filter }: Props) => {
+const AllAnswers = async ({ questionId, totalAnswers, page, userId, filter, searchParams}: Props) => {
   const result = await getAnswers({
     questionId,
+    page: searchParams?.page ? +searchParams?.page : 1,
+    sortBy: filter
   })
 
 

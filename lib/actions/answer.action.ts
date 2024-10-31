@@ -25,7 +25,7 @@ export async function createAnswer(params: CreateAnswerParams) {
 
     revalidatePath(path)
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -34,15 +34,43 @@ export async function getAnswers(params: GetAnswersParams) {
   try {
     connectToDatabase();
 
-    const { questionId } = params;
+
+    const { questionId, sortBy, page = 1, pageSize = 10 } = params;
+
+    const skipAmount = (page - 1) * 10
+    console.log(pageSize)
+    let sortOptions = {};
+    switch (sortBy) {
+      case "heighestUpvotes":
+        sortOptions = { upvotes: -1 };
+        break;
+      case "lowestUpvotes":
+        sortOptions = { upvotes: 1 };
+        break;
+      case "recent":
+        sortOptions = { createdAt: -1 };
+        break;
+      case "old":
+        sortOptions = { createdAt: 1 };
+        break;
+      default:
+        break;
+    }
+
+
 
     const answers = await Answer.find({ question: questionId })
       .populate("author", "_id clerkId name picture")
       .sort({ createdAt: -1 })
+      .sort(sortOptions)
+      .skip(skipAmount)
+      .limit(10)
 
-    return { answers };
+    const isNext = await Answer.countDocuments({ question: questionId }) > skipAmount + answers.length
+
+    return { answers: answers, isNext };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -77,7 +105,7 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
     revalidatePath(path)
     // increment author reputation by +10 for upvoting the question
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -112,7 +140,7 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
     revalidatePath(path)
     // increment author reputation by +10 for upvoting the question
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -125,11 +153,12 @@ export async function getAllUserAnswers(params: GetUserStatsParams) {
 
     const { userId, pageSize = 10, page = 1 } = params;
 
+    const skipAmount = (page - 1) * pageSize;
 
     const total = await Answer.countDocuments({ author: userId });
     const Answers = await Answer.find({ author: userId })
       .sort({ createdAt: -1 })
-      .skip((page - 1) * pageSize)
+      .skip(skipAmount)
       .limit(pageSize)
       .populate({
         path: "question",
@@ -141,9 +170,10 @@ export async function getAllUserAnswers(params: GetUserStatsParams) {
         model: User,
         select: "_id clerkId name picture",
       })
-    return { answers: Answers, total };
+    const isNext = total > skipAmount + Answers.length
+    return { answers: Answers, total, isNext };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -167,7 +197,7 @@ export async function deleteAnswer(params: DeleteAnswerParams) {
     revalidatePath(path);
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }

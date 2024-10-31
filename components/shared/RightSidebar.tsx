@@ -8,11 +8,9 @@ import { getPopularTags } from "@/lib/actions/tag.action";
 const RightSidebar = async () => {
 
   const Hotquestion = await getHotQuestions()
-  console.log(Hotquestion, "Hot questions")
 
 
   const popularTags = await getPopularTags()
-  console.log(popularTags, "popular tags")
   return (
     <section
       className="background-light900_dark200 light-border sticky right-0 top-0 flex h-screen w-[350px] 

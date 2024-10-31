@@ -2,7 +2,7 @@
 
 import User from "@/database/user.model";
 import { connectToDatabase } from "../mongoose";
-import { FilterQuery } from "mongoose";
+import { FilterQuery, SortOrder } from "mongoose";
 import {
   CreateUserParams,
   DeleteUserParams,
@@ -24,10 +24,9 @@ export async function getUserById(params: any) {
     const { userId } = params;
 
     const user = await User.findOne({ clerkId: userId });
-    console.log(user);
     return user;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -38,7 +37,7 @@ export async function createUser(userData: CreateUserParams) {
     const newUser = await User.create(userData);
     return newUser;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -56,7 +55,7 @@ export async function updateUser(params: UpdateUserParams) {
 
     revalidatePath(path);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -83,18 +82,55 @@ export async function deleteUser(params: DeleteUserParams) {
     // delete user questions
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
 export async function getAllUsers(params: GetAllUsersParams) {
+
+
+  const { searchQuery, filter, page = 1, pageSize = 10 } = params;
+
+
+  const skipamount = (page - 1) * pageSize
+
+
+  const query: FilterQuery<typeof User> = {}
+
+  if (searchQuery) {
+    query.$or = [
+      { username: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+      { email: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+      { name: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+    ]
+  }
+
+  let sort: { [key: string]: SortOrder } = {};
+
+  if (filter) {
+    switch (filter) {
+
+      case "new_users":
+        sort = { joinedAt: -1 }; // Assuming `joinedAt` is a timestamp field
+        break;
+      case "old_users":
+        sort = { joinedAt: 1 }; // Assuming `joinedAt` is a timestamp field
+        break;
+    }
+  }
+
   try {
     connectToDatabase();
 
-    const users = await User.find({}).sort({ createdAt: -1 });
-    return { users };
+    const users = await User.find(query).sort(sort).skip(skipamount).limit(pageSize);
+
+    const totalUsers = await User.countDocuments(query);
+    const isNext = totalUsers > skipamount + pageSize
+
+
+    return { users, isNext };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -140,7 +176,9 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
   try {
     await connectToDatabase();
 
-    const { clerkId, searchQuery } = params;
+    const { clerkId, searchQuery, page = 1, pageSize = 10 } = params;
+
+    const skipAmount = (page - 1) * pageSize
 
     const query: FilterQuery<typeof Question> = searchQuery ?
       { title: { $regex: new RegExp(searchQuery, 'i') } } : {}
@@ -150,6 +188,8 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
       match: query,
       options: {
         sort: { createdAt: -1 },
+        skip: skipAmount,
+        limit: pageSize + 1
       },
       populate: [
         { path: 'tags', model: Tag, select: '_id name' },
@@ -157,15 +197,21 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
       ]
     });
 
+    const totalQuestions = user?.saved.length || 0;
+
+    const isNext = totalQuestions > skipAmount + pageSize
+
     if (!user) {
       throw new Error("User not found");
     }
+
 
 
     const savedQuestions = user.saved
 
     return {
       question: savedQuestions,
+      isNext
     }
   } catch (error) {
     console.error("Error fetching saved questions:", error);
@@ -196,7 +242,7 @@ export async function getUserInfo(params: GetUserByIdParams) {
     }
   }
   catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }

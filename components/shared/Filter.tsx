@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 
 import {
   Select,
@@ -9,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn, formUrlQuery } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Props {
   filters: {
@@ -22,7 +23,26 @@ interface Props {
 }
 
 const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
-  const [value, setValue] = React.useState(filters[1].value);
+  const [value, setValue] = React.useState(filters[0].value);
+
+  const searchParams = useSearchParams();
+
+  const router = useRouter();
+
+
+  useEffect(() => {
+    if (value) {
+      const newurl = formUrlQuery({
+        params: searchParams.toString(),
+        key: "filter",
+        value: value
+      })
+      router.push(newurl, { scroll: false })
+    }
+
+  }, [value , router, searchParams])
+
+
   return (
     <div className={`relative  ${containerClasses}`}>
       <Select value={value} onValueChange={setValue}>
@@ -37,7 +57,7 @@ const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
         <SelectContent className="dark:bg-black bg-white" >
           <SelectGroup>
             {filters.map((item) => (
-              <SelectItem key={item.value} value={item.value}  >
+              <SelectItem key={item.value} value={item.value} onChange={() => setValue(item.value)} >
                 <span className={cn("dark:text-white , dark:bg-black")}>
                   {item.name}
                 </span>
@@ -49,5 +69,6 @@ const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
     </div>
   );
 };
+
 
 export default Filter;

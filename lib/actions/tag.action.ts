@@ -22,19 +22,39 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
       { _id: "3", name: "tag3" },
     ];
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
 
 export async function getAllTags(params: GetAllTagsParams) {
+
+  const { searchQuery, page = 1, pageSize = 10 } = params;
+
+  const skipAmount = (page - 1) * pageSize;
+
+  const query: FilterQuery<ITag> = {}
+
+  if (searchQuery) {
+    query.$or = [
+      { name: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+      { description: { $regex: new RegExp(`^${searchQuery}$`, "i") } },
+    ]
+  }
   try {
     connectToDatabase();
 
-    const tags = await Tag.find({});
-    return { tags };
+    const tags = await Tag.find(query)
+      .skip(skipAmount)
+      .limit(pageSize + 1)
+      ;
+
+    const totalTags = await Tag.countDocuments(query);
+    const isNext = totalTags > skipAmount + tags.length;
+
+    return { tags: tags, totalTags, isNext };
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }
@@ -77,7 +97,7 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
     return { tagTitle: tag.name, questions, isNext };
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 }

@@ -19,7 +19,6 @@ const Page = async ({ params }: any = {}) => {
       <h1 className="h1-bold text-dark100_light900">Edit a question</h1>
       <div className="mt-9">
         <Question questionDetails={JSON.stringify(QuestionDetail)} type="Edit" mongoUserId={JSON.stringify(mongoUser?._id)} />
-
       </div>
     </div>
   )
