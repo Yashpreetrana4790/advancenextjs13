@@ -1,8 +1,8 @@
 "use client";
 import { HomePageFilters } from "@/constants/filters";
-import React, { useEffect } from "react";
+import React from "react";
 import { Button } from "../ui/button";
-import { usePathname, useSearchParams } from "next/navigation";
+import {  useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { formUrlQuery,  } from "@/lib/utils";
 
@@ -10,9 +10,7 @@ const Homefilters = () => {
 
   const [active, setActive] = React.useState<string>("all");
   const searchParams = useSearchParams();
-  const pathname = usePathname();
   const router = useRouter();
-  const query = searchParams.get("filter");
 
   const handleTypeClick = (item: string) => {
 

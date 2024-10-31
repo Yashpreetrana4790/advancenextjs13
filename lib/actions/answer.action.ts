@@ -38,32 +38,37 @@ export async function getAnswers(params: GetAnswersParams) {
     const { questionId, sortBy, page = 1, pageSize = 10 } = params;
 
     const skipAmount = (page - 1) * 10
-
-    let sortOptions = {}
+    console.log(pageSize)
+    let sortOptions = {};
     switch (sortBy) {
       case "heighestUpvotes":
-        sortOptions = { upvotes: -1 }
+        sortOptions = { upvotes: -1 };
+        break;
       case "lowestUpvotes":
-        sortOptions = { upvotes: 1 }
+        sortOptions = { upvotes: 1 };
+        break;
       case "recent":
-        sortOptions = { createdAt: -1 }
+        sortOptions = { createdAt: -1 };
+        break;
       case "old":
-        sortOptions = { createdAt: 1 }
+        sortOptions = { createdAt: 1 };
+        break;
       default:
-        break
+        break;
     }
+
 
 
     const answers = await Answer.find({ question: questionId })
       .populate("author", "_id clerkId name picture")
       .sort({ createdAt: -1 })
-      .sort(sortOptions) 
+      .sort(sortOptions)
       .skip(skipAmount)
       .limit(10)
 
     const isNext = await Answer.countDocuments({ question: questionId }) > skipAmount + answers.length
 
-    return { answers : answers, isNext };
+    return { answers: answers, isNext };
   } catch (error) {
     console.error(error);
     throw error;

@@ -1,6 +1,6 @@
 import Filter from "@/components/shared/Filter";
 import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
-import { TagFilters, UserFilters } from "@/constants/filters";
+import { TagFilters } from "@/constants/filters";
 import React from "react";
 import NoResult from "@/components/shared/NoResult";
 import Link from "next/link";

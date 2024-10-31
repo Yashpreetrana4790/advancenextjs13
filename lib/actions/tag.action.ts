@@ -6,7 +6,6 @@ import { GetAllTagsParams, GetQuestionsByTagIdParams, GetTopInteractedTagsParams
 import Tag, { ITag } from "@/database/tag.model";
 import Question from "@/database/question.model";
 import { FilterQuery } from "mongoose";
-import queryString from "query-string";
 
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   try {
@@ -30,7 +29,7 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
 
 export async function getAllTags(params: GetAllTagsParams) {
 
-  const { searchQuery, filter, page = 1, pageSize = 10 } = params;
+  const { searchQuery, page = 1, pageSize = 10 } = params;
 
   const skipAmount = (page - 1) * pageSize;
 
