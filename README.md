@@ -1,5 +1,5 @@
 DevFlow - Stack Overflow Clone
-DevFlow is a high-performance, full-stack application built by Yash using MongoDB and Next.js 14. Inspired by the ShadCN design philosophy, it mimics the core features of Stack Overflow, adding reputation and badge systems, AI-generated answers, and a robust job board. Designed with accessibility and SEO at the forefront, DevFlow uses Next.js server actions and TypeScript for optimal performance and maintainability.
+DevFlow is a high-performance, full-stack application built by me using MongoDB and Next.js 14. Inspired by the ShadCN design philosophy, it mimics the core features of Stack Overflow, adding reputation and badge systems, AI-generated answers, and a robust job board. Designed with accessibility and SEO at the forefront, DevFlow uses Next.js server actions and TypeScript for optimal performance and maintainability.
 
 Table of Contents
 Getting Started
