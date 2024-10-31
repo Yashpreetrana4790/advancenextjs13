@@ -50,7 +50,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
         editor.setContent('');
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setIsSubmitting(false)
     }

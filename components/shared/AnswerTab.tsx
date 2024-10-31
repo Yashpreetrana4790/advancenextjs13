@@ -1,11 +1,13 @@
 import { getAllUserAnswers } from '@/lib/actions/answer.action'
 import React from 'react'
 import AnswerCard from '../cards/AnswerCard'
+import Pagination from './Pagination'
 
-const AnswerTab = async ({ userId, clerkId }: any) => {
-  const userAnswers = await getAllUserAnswers({ userId, page: 1 })
+const AnswerTab = async ({ userId, clerkId , searchParams }: any) => {
+  const userAnswers = await getAllUserAnswers({ userId, page: searchParams.page ? +searchParams.page : 1 })
 
   return (
+    <>
     <div className="grid grid-cols-1 gap-5">
 
       {userAnswers?.answers?.map((answer) => (
@@ -20,6 +22,13 @@ const AnswerTab = async ({ userId, clerkId }: any) => {
         />
       ))}
     </div>
+    <div>
+    <Pagination 
+        pageNumber={searchParams.page ? +searchParams.page : 1}
+        isNext={userAnswers.isNext}
+        />
+    </div>
+      </>
   )
 }
 

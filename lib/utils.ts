@@ -70,7 +70,6 @@ interface RemoveUrlQueryParams {
 export const formUrlQuery = ({ params, key, value }: UrlQueryParams) => {
 
   const currentUrl = qs.parse(params);
-  console.log(currentUrl, "qs parsing");
   currentUrl[key] = value;
   return qs.stringifyUrl({
     url: window.location.pathname,
@@ -79,17 +78,7 @@ export const formUrlQuery = ({ params, key, value }: UrlQueryParams) => {
     { skipNull: true });
 }
 
-// export const HomeFilterchange = ({ params, key, value }: UrlQueryParams) => {
 
-//   const currentUrl = qs.parse(params);
-//   console.log(currentUrl, "qs parsing");
-//   currentUrl[key] = value;
-//   return qs.stringifyUrl({
-//     url: window.location.pathname,
-//     query: currentUrl,
-//   },
-//     { skipNull: true });
-// }
 
 export const removeKeysFromQuery = ({ params, KeysToRemove }: RemoveUrlQueryParams) => {
   const currentUrl = qs.parse(params);
