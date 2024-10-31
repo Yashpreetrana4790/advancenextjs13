@@ -1,5 +1,4 @@
 "use client"
-import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect } from 'react'
 import { ReloadIcon } from '@radix-ui/react-icons';
@@ -85,7 +84,7 @@ const GlobalResult = () => {
                   key={item.type + item.id + index}
                   className="flex w-full cursor-pointer items-start gap-3 px-5 py-2.5 hover:bg-light-700/50 dark:bg-dark-500/50"
                 >
-                 <Tag className="text-primary-500" />
+                  <Tag className="text-primary-500" />
 
                   <div className='flex flex-col'>
                     <p className="body-medium text-dark200_light800 line-clamp-1">{item.title}</p>

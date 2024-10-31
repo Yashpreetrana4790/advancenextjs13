@@ -1,5 +1,5 @@
 "use server";
-import { SortOrder } from "mongoose";
+import { SortOrder, FilterQuery } from "mongoose";
 import Question from "@/database/question.model";
 import Tag from "@/database/tag.model";
 
@@ -17,7 +17,6 @@ import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
 import Answer from "@/database/answer.model";
 import Interaction from "@/database/Interaction.model";
-import { FilterQuery } from "mongoose";
 
 export async function getQuestions(params: GetQuestionsParams) {
 
