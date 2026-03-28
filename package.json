@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node api.js && next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node api.js && next start",
     "lint": "next lint"
   },
   "dependencies": {
@@ -29,7 +29,6 @@
     "mongodb": "^6.2.0",
     "mongoose": "^7.6.3",
     "next": "latest",
-    "node-fetch": "^3.3.2",
     "prettier": "^3.0.3",
     "prismjs": "^1.29.0",
     "query-string": "^9.1.0",
