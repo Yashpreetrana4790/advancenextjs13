@@ -2,7 +2,6 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import qs from "query-string";
 import { BADGE_CRITERIA } from "@/constants";
-import { createInflateRaw } from "zlib";
 import { BadgeCounts } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
