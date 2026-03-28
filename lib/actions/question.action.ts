@@ -113,8 +113,28 @@ export async function createQuestion(params: CreateQuestionParams) {
       $push: { tags: { $each: tagDocuments } },
     })
 
+
+
+
+    await Interaction.create({
+      user: author,
+      action: "ask_question",
+      question: question._id,
+      tags: tagDocuments
+    })
+
+    await User.findByIdAndUpdate(author,
+      {
+        $inc: {
+          reputation: 10
+        }
+      })
+
     revalidatePath(path);
-  } catch (error) { }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export async function getQuestionById(params: GetQuestionByIdParams) {
@@ -156,6 +176,28 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
       updatequery = { $addToSet: { upvotes: userId } }
     }
 
+   const questionDetail = await Question.findById(questionId)
+
+    if (!questionDetail) {
+      throw new Error("questionDetail not found")
+    }
+
+    await User.findByIdAndUpdate(userId,
+      {
+        $inc: {
+          reputation: hasupVoted ? -2 : 2
+        }
+      })
+
+    await User.findByIdAndUpdate(questionDetail.author,
+      {
+        $inc: {
+          reputation: hasupVoted ? 10 : -10
+        }
+      })
+
+
+
     const question = await Question.findByIdAndUpdate(
       questionId, updatequery, { new: true }
     )
@@ -163,6 +205,8 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
     if (!question) {
       throw new Error("Question not found")
     }
+
+
 
     revalidatePath(path)
     // increment author reputation by +10 for upvoting the question
@@ -199,6 +243,22 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
       throw new Error("Question not found")
     }
 
+
+    await User.findByIdAndUpdate(userId,
+      {
+        $inc: {
+          reputation: hasdownVoted ? 2 : -2
+        }
+      })
+
+    await User.findByIdAndUpdate(question.author,
+      {
+        $inc: {
+          reputation: hasdownVoted ? -10 : 10
+        }
+      })
+
+
     revalidatePath(path)
 
 
@@ -223,7 +283,7 @@ export async function getAllUserQuestions(params: GetUserStatsParams) {
 
     const total = await Question.countDocuments({ author: userId });
     const questions = await Question.find({ author: userId })
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1, views: -1, })
       .skip(skipAmount)
       .limit(pageSize + 1)
       .populate({ path: "tags", model: Tag, select: "_id name" })
