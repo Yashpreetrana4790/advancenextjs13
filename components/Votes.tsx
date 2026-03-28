@@ -43,7 +43,7 @@ const Votes = ({
   const handleVote = async (action: string) => {
 
     if (!userId) {
-      return
+      return router.push("/login");
     }
 
     if (action === "upvote") {
@@ -94,6 +94,8 @@ const Votes = ({
 
     })
   }, [userId, pathname, router, itemId])
+
+
 
   return (
     <div className="flex gap-5">
@@ -152,6 +154,7 @@ const Votes = ({
           onClick={handleSave}
         />
       )}
+
     </div>
   );
 };

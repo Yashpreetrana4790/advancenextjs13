@@ -16,6 +16,8 @@ import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
 import Tag from "@/database/tag.model";
 import Answer from "@/database/answer.model";
+import { BadgeCriteriaType } from "@/types";
+import { assignBadges } from "../utils";
 
 export async function getUserById(params: any) {
   try {
@@ -233,12 +235,42 @@ export async function getUserInfo(params: GetUserByIdParams) {
 
     const totalquestions = await Question.countDocuments({ author: user._id });
     const totalanswers = await Answer.countDocuments({ author: user._id });
+    const [QuestionupVotes] = await Question.aggregate([
+      { $match: { author: user._id } },
+      { $project: { _id: null, upvotes: { $size: "$upvotes" } } },
+      { $group: { _id: null, totalupVotes: { $sum: "$upvotes" } } }
+    ]);
+
+    const [AnswersupVotes] = await Answer.aggregate([
+      { $match: { author: user._id } },
+      { $project: { _id: null, upvotes: { $size: "$upvotes" } } },
+      { $group: { _id: null, totalupVotes: { $sum: "$upvotes" } } }
+    ]);
+
+
+    const [questionViews] = await Question.aggregate([
+      { $match: { author: user._id } },
+      { $group: { _id: null, totalViews: { $sum: "$views" } } }
+    ])
+
+
+    const criteria = [
+      { type: 'ANSWER_COUNT' as BadgeCriteriaType, count: totalanswers },
+      { type: 'QUESTION_COUNT' as BadgeCriteriaType, count: totalquestions },
+      { type: 'QUESTION_UPVOTES' as BadgeCriteriaType, count: QuestionupVotes?.totalupVotes || 0 },
+      { type: 'ANSWER_UPVOTES' as BadgeCriteriaType, count: AnswersupVotes?.totalupVotes || 0 },
+      { type: 'TOTAL_VIEWS' as BadgeCriteriaType, count: questionViews?.totalViews || 0 },
+    ]
+
+
+    const badgeCounts = assignBadges({ criteria })
 
     return {
       user,
       totalquestions,
-      totalanswers
-
+      totalanswers,
+      badgeCounts,
+      reputation : user.reputation
     }
   }
   catch (error) {
