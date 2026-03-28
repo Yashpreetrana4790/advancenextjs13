@@ -257,9 +257,9 @@ export async function getUserInfo(params: GetUserByIdParams) {
     const criteria = [
       { type: 'ANSWER_COUNT' as BadgeCriteriaType, count: totalanswers },
       { type: 'QUESTION_COUNT' as BadgeCriteriaType, count: totalquestions },
-      { type: 'UPVOTE_COUNT' as BadgeCriteriaType, count: QuestionupVotes.totalupVotes || 0 },
-      { type: 'ANSWER_UPVOTE_COUNT' as BadgeCriteriaType, count: AnswersupVotes.totalupVotes || 0 },
-      { type: 'VIEW_COUNT' as BadgeCriteriaType, count: questionViews.totalViews || 0 },
+      { type: 'QUESTION_UPVOTES' as BadgeCriteriaType, count: QuestionupVotes?.totalupVotes || 0 },
+      { type: 'ANSWER_UPVOTES' as BadgeCriteriaType, count: AnswersupVotes?.totalupVotes || 0 },
+      { type: 'TOTAL_VIEWS' as BadgeCriteriaType, count: questionViews?.totalViews || 0 },
     ]
 
 
